@@ -25,10 +25,6 @@ void start()
 	std::uniform_int_distribution<> dist_hp(50, 100);
 	std::uniform_int_distribution<> dist_attack(50, 100);
 
-	CharacterParams player;
-	CharacterParams slime;
-	CharacterParams goblin;
-
 	int player_hp = dist_hp(rd);
 	int player_attack = dist_attack(rd);
 	printf("Player\n");
@@ -45,11 +41,42 @@ void start()
 	DispParameter(goblin_hp, goblin_attack);
 
 	std::unique_ptr<Character> player(new Character("Player", player_hp, player_attack));
+
+	std::vector<std::unique_ptr<Character>> enemies;
+	enemies.push_back(std::unique_ptr<Character>(new Character("Slime", slime_hp, slime_attack)));
+	enemies.push_back(std::unique_ptr<Character>(new Character("Goblin", goblin_hp, goblin_attack)));
+
+	std::cout << "--- バトル開始 ---\n";
+	TurnManager turnManager;
+	int turn = 1;
+
+	while (!player->isDead() && !enemies.empty()) {
+		std::cout << "\n[ ターン " << turn << " ]\n";
+
+		Character& currentEnemy = *enemies.front();
+
+		turnManager.executeTurn(*player, currentEnemy);
+
+
+		if (currentEnemy.isDead()) {
+			enemies.erase(enemies.begin());
+			std::cout << "敵を倒した！ 残りの敵: " << enemies.size() << "体\n";
+		}
+
+		turn++;
+	}
+
+	std::cout << "\n--- バトル終了 ---\n";
+	if (player->isDead()) {
+		std::cout << "ゲームオーバー...\n";
+	}
+	else {
+		std::cout << "すべての敵を倒した！\n";
+	}
 }
 
 class TurnManager {
 public:
-	// 要件6: メンバ変数にインスタンスを持たせず、引数で受け取る
 	void executeTurn(Character& player, Character& enemy) {
 		if (!player.isDead()) {
 			player.attack(enemy);
@@ -113,3 +140,6 @@ int main()
 	return 0;
 
 }
+
+//動かないです！
+//わからないところが多くAIを使っているところがあります；；
