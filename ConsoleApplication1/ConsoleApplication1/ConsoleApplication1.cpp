@@ -18,6 +18,58 @@ void DispParameter(int hp,int attack)
 	printf("Attack: %d\n", attack);
 }
 
+class TurnManager {
+public:
+	void executeTurn(Character& player, Character& enemy) {
+		if (!player.isDead()) {
+			player.attack(enemy);
+		}
+		if (!enemy.isDead()) {
+			enemy.attack(player);
+		}
+	}
+};
+
+class Character
+{
+private:
+	CharacterParams params;
+public:
+	Character(std::string name, int hp, int attack) {
+		params.name = name;
+		params.hp = hp;
+		params.attack = attack;
+		params.isDead = false;
+	}
+
+	void attack(Character& target) {
+		if (params.isDead) return;
+		std::cout << params.name << " の攻撃\n";
+		target.takeDamage(params.attack);
+	}
+
+	void takeDamage(int damage) {
+		if (params.isDead) return;
+		params.hp -= damage;
+		std::cout << params.name << " は " << damage << " のダメージ (残りHP: " << params.hp << ")\n";
+		if (params.hp <= 0) die();
+	}
+
+	void die() {
+		params.hp = 0;
+		params.isDead = true;
+		std::cout << params.name << " は倒された\n";
+	}
+
+	bool isDead() const { return params.isDead; }
+};
+
+void DispParameter(std::string name, int hp, int attack) {
+	std::cout << name << "\n";
+	std::cout << "HP: " << hp << "\n";
+	std::cout << "Attack: " << attack << "\n\n";
+}
+
 void start()
 {
 	std::random_device rd;
@@ -74,64 +126,6 @@ void start()
 		std::cout << "すべての敵を倒した！\n";
 	}
 }
-
-class TurnManager {
-public:
-	void executeTurn(Character& player, Character& enemy) {
-		if (!player.isDead()) {
-			player.attack(enemy);
-		}
-		if (!enemy.isDead()) {
-			enemy.attack(player);
-		}
-	}
-};
-
-
-
-class Character 
-{
-private:
-	CharacterParams params;
-public:
-	Character(std::string name, int hp, int attack) {
-		params.name = name;
-		params.hp = hp;
-		params.attack = attack;
-		params.isDead = false;
-	}
-
-	void attack(Character& target) {
-		if (params.isDead) return;
-		std::cout << params.name << " の攻撃\n";
-		target.takeDamage(params.attack);
-	}
-
-	void takeDamage(int damage) {
-		if (params.isDead) return;
-		params.hp -= damage;
-		std::cout << params.name << " は " << damage << " のダメージ (残りHP: " << params.hp << ")\n";
-		if (params.hp <= 0) die();
-	}
-
-	void die() {
-		params.hp = 0;
-		params.isDead = true;
-		std::cout << params.name << " は倒された\n";
-	}
-
-	bool isDead() const { return params.isDead; }
-};
-
-void DispParameter(std::string name, int hp, int attack) {
-	std::cout << name << "\n";
-	std::cout << "HP: " << hp << "\n";
-	std::cout << "Attack: " << attack << "\n\n";
-}
-
-
-
-
 
 int main()
 {
